@@ -1,0 +1,2 @@
+REPO hadoop
+LOAD hadoop.yml stack.yml

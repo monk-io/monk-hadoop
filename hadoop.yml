@@ -1,0 +1,230 @@
+namespace: monk-hadoop 
+
+hadoop-common:
+  metadata:
+    defines: metadata
+    name: Vault by HashiCorp
+    description: Vault secures, stores, and tightly controls access to tokens, passwords, certificates, API keys, and other secrets in modern computing.
+    website: https://www.vaultproject.io
+    publisher: monk.io
+    icon: vault-hashicorp.png 
+  variables:
+    core_conf_fs:
+      env: CORE_CONF_fs_defaultFS
+      value: <- `hdfs://${monk_hdfs_namenode_host}:9000`
+    core_conf_http_staticuser_user:
+      env: CORE_CONF_hadoop_http_staticuser_user
+      value: root
+    core_conf_proxy_user_hue_hosts:
+      env: CORE_CONF_hadoop_proxyuser_hue_hosts
+      value: "*"
+    core_conf_proxy_user_hue_groups:
+      env: CORE_CONF_hadoop_proxyuser_hue_groups
+      value: "*"
+    core_conf_compression_codec:
+      env: CORE_CONF_io_compression_codecs
+      value: org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.BZip2Codec,org.apache.hadoop.io.compress.SnappyCodec
+    hdfs_conf_webhdfs_enabled:
+      env: HDFS_CONF_dfs_webhdfs_enabled
+      value: true
+    hdfs_conf_permissions_enabled:
+      env: HDFS_CONF_dfs_permissions_enabled
+      value: false
+    hdfs_conf_namenode_datanode_registration_ip_hostname_check:
+      env: HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check
+      value: false
+    yarn_conf_log_aggregation_enabled:
+      env: YARN_CONF_yarn_log___aggregation___enable
+      value: true
+    yarn_conf_log_server_url:
+      env: YARN_CONF_yarn_log_server_url
+      value: <- `http://${monk_hdfs_historyserver_host}:8188/applicationhistory/logs/`
+    yarn_conf_resourcenamemanager_recovery_enabled:
+      env: YARN_CONF_yarn_resourcemanager_recovery_enabled
+      value: true
+    yarn_conf_resourcenamemanager_store_class:
+      env: YARN_CONF_yarn_resourcemanager_store_class
+      value: org.apache.hadoop.yarn.server.resourcemanager.recovery.FileSystemRMStateStore
+    yarn_conf_resourcemanager_scheduler_class:
+      env: YARN_CONF_yarn_resourcemanager_scheduler_class
+      value: org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler
+    yarn_conf_scheduler_capacity_root_queues:
+      env: YARN_CONF_yarn_scheduler_capacity_root_queues
+      value: default
+    yarn_conf_scheduler_capacity_root_default_capacity_allocation_mb:
+      env: YARN_CONF_yarn_scheduler_capacity_root_default_maximum___allocation___mb
+      value: 8192
+    yarn_conf_scheduler_capacity_root_default_maximum_allocation_vcores:
+      env: YARN_CONF_yarn_scheduler_capacity_root_default_maximum___allocation___vcores
+      value: 4
+    yarn_conf_resourcemanager_fs_state_store_uri:
+      env: YARN_CONF_yarn_resourcemanager_fs_state___store_uri
+      value: /rmstate
+    yarn_conf_resourcemanager_system_metrics_publisher_enabled:
+      env: YARN_CONF_yarn_resourcemanager_system___metrics___publisher_enabled
+      value: true
+    yarn_conf_resourcemanager_hostname:
+      env: YARN_CONF_yarn_resourcemanager_hostname
+      value: <- `${monk_hdfs_resourcemanager_host}`
+    yarn_conf_resourcemanager_address:
+      env: YARN_CONF_yarn_resourcemanager_address
+      value: <- `${monk_hdfs_resourcemanager_host}:8032`
+    yarn_conf_resourcemanager_scheduler_address:   
+      env: YARN_CONF_yarn_resourcemanager_scheduler_address
+      value: <- `${monk_hdfs_resourcemanager_host}:8030` 
+    yarn_conf_resourcemanager_resource_tracker_address:
+      env: YARN_CONF_yarn_resourcemanager_resource___tracker_address
+      value: <- `${monk_hdfs_resourcemanager_host}:8031`
+    yarn_conf_timeline_service_enabled:
+      env: YARN_CONF_yarn_timeline___service_enabled
+      value: true
+    yarn_conf_timeline_service_generic_application_history_enabled:
+      env: YARN_CONF_yarn_timeline___service_generic___application___history_enabled
+      value: true
+    yarn_conf_timeline_service_hostname:
+      env: YARN_CONF_yarn_timeline___service_hostname
+      value: <- `${monk_hdfs_historyserver_host}`
+    yarn_conf_mapreduce_output_compression:
+      env: YARN_CONF_mapreduce_map_output_compress
+      value: true
+    yarn_conf_mapred_output_compression_codec:
+      env: YARN_CONF_mapred_map_output_compress_codec
+      value: org.apache.hadoop.io.compress.SnappyCodec
+    yarn_conf_nodemanager_resource_memory_mb:
+      env: YARN_CONF_yarn_nodemanager_resource_memory___mb
+      value: 16384
+    yarn_conf_nodemanager_resource_cpu_vcores:
+      env: YARN_CONF_yarn_nodemanager_resource_cpu___vcores
+      value: 8
+    yarn_conf_nodemanager_disk_health_check_utilization_threshold_pct:
+      env: YARN_CONF_yarn_nodemanager_disk___health___checker_max___disk___utilization___per___disk___percentage
+      value: 98.5
+    yarn_conf_nodemanager_remote_app_log_dir:
+      env: YARN_CONF_yarn_nodemanager_remote___app___log___dir
+      value: /app-logs
+    yarn_conf_nodemanager_aux_services:
+      env: YARN_CONF_yarn_nodemanager_aux___services
+      value: mapreduce_shuffle
+    mapred_conf_framework_name:
+      env: MAPRED_CONF_mapreduce_framework_name
+      value: yarn
+    mapred_conf_child_java_opts:
+      env: MAPRED_CONF_mapred_child_java_opts
+      value: -Xmx4096m
+    mapred_conf_map_memory_mb:
+      env: MAPRED_CONF_mapreduce_map_memory_mb
+      value: 4096
+    mapred_conf_reduce_memory_mb:
+      env: MAPRED_CONF_mapreduce_reduce_memory_mb
+      value: 8192
+    mapred_conf_map_java_opts:
+      env: MAPRED_CONF_mapreduce_map_java_opts
+      value: -Xmx3072m
+    mapred_conf_reduce_java_opts:
+      env: MAPRED_CONF_mapreduce_reduce_java_opts
+      value: -Xmx6144m
+    mapred_conf_app_mapreduce_am_resource_mb:
+      env: MAPRED_CONF_yarn_app_mapreduce_am_env
+      value: HADOOP_MAPRED_HOME=/opt/hadoop-3.2.1/
+    mapred_conf_map_env:
+      env: MAPRED_CONF_mapreduce_map_env
+      value: HADOOP_MAPRED_HOME=/opt/hadoop-3.2.1/
+    mapred_conf_reduce_env:
+      env: MAPRED_CONF_mapreduce_reduce_env
+      value: HADOOP_MAPRED_HOME=/opt/hadoop-3.2.1/
+    name_node_http:
+      type: int
+      value: 9870
+    name_node_port:
+      type: int
+      value: 9000
+    monk_hdfs_namenode_host:
+      env: NAMENODE_HOST
+      value: <- get-hostname("monk-hadoop/hadoop-name-node", "monk-hadoop-name-node") split(".dns.podman") join("")
+      type: string
+    monk_hdfs_datanode_host:
+      env: DATANODE_HOST
+      value: <- get-hostname("monk-hadoop/hadoop-data-node", "monk-hadoop-data-node") split(".dns.podman") join("")
+      type: string
+    monk_hdfs_resourcemanager_host:
+      env: RESOURCEMANAGER_HOST
+      value: <- get-hostname("monk-hadoop/hadoop-resource-manager-node", "monk-hadoop-resourcemanager-node") split(".dns.podman") join("")
+      type: string
+    monk_hdfs_historyserver_host:
+      env: RESOURCEMANAGER_HOST
+      value: <- get-hostname("monk-hadoop/hadoop-history-manager-node", "monk-hadoop-historyserver-node") split(".dns.podman") join("")
+      type: string
+    monk_hdfs_datanode_service_precondition:
+      env: DATANODE_SERVICE_PRECONDITION
+      value: <- `${monk_hdfs_namenode_host}:9870`
+      type: string
+    monk_hdfs_resourcemanager_service_precondition:
+      env: RESOURCEMANAGER_SERVICE_PRECONDITION
+      value: <- `${monk_hdfs_namenode_host}:9000 ${monk_hdfs_namenode_host}:9870 ${monk_hdfs_datanode_host}:9864`
+      type: string
+    monk_hdfs_nodemanager_service_precondition:
+      env: RESOURCEMANAGER_SERVICE_PRECONDITION
+      value: <- `${monk_hdfs_namenode_host}:9000 ${monk_hdfs_namenode_host}:9870 ${monk_hdfs_datanode_host}:9864 ${monk_hdfs_resourcemanager_host}:8088`
+      type: string
+    volume_local:
+      type: string
+      value: <- `${monk-volume-path}/monk-hadoop-1`
+    image-tag:
+      env: IMAGE_TAG
+      value: <- `${image_tag}`
+      type: string
+    monk_hdfs_cluster_name:
+      env: CLUSTER_NAME
+      value: <- `${cluster_name}`
+      type: string
+
+hadoop-name-node:
+  defines: runnable
+  inherits: ./hadoop-common
+  containers:
+    monk-hadoop-name-node:
+      paths:
+        - <- `${volume_local}/namenode:/hadoop/dfs/name`
+      ports:
+        - <- `0.0.0.0:${name_node_http}:9870`
+        - <- `0.0.0.0:${name_node_port}:9000`
+      image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+
+hadoop-data-node:
+  defines: runnable
+  inherits: ./hadoop-common
+  containers:
+    monk-hadoop-data-node:
+      paths:
+        - <- `${volume_local}/datanode:/hadoop/dfs/data`
+      image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+      environment:
+        - <- `SERVICE_PRECONDITION=${monk_hdfs_datanode_service_precondition}`
+
+hadoop-resource-manager-node:
+  defines: runnable
+  inherits: ./hadoop-common
+  containers:
+    monk-hadoop-resourcemanager-node:
+      image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
+      environment:
+        - <- `SERVICE_PRECONDITION=${monk_hdfs_resourcemanager_service_precondition}`
+hadoop-node-manager-node:
+  defines: runnable
+  inherits: ./hadoop-common
+  containers:
+    monk-hadoop-nodemanager-node:
+      image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
+      environment:
+        - <- `SERVICE_PRECONDITION=${monk_hdfs_nodemanager_service_precondition}`
+hadoop-history-manager-node:
+  defines: runnable
+  inherits: ./hadoop-common
+  containers:
+    monk-hadoop-historyserver-node:
+      image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
+      paths:
+        - <- `${volume_local}/historyserver:/hadoop/yarn/timeline`
+      environment:
+        - <- `SERVICE_PRECONDITION=${monk_hdfs_nodemanager_service_precondition}`
+

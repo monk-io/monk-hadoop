@@ -1,0 +1,14 @@
+namespace: monk-hadoop
+
+stack:
+  defines: process-group
+  runnable-list:
+    - monk-hadoop/hadoop-name-node
+    - monk-hadoop/hadoop-data-node
+    - monk-hadoop/hadoop-resource-manager-node
+    - monk-hadoop/hadoop-node-manager-node
+    - monk-hadoop/hadoop-history-manager-node
+  variables:
+    image_tag:
+      value: 3.2.1-hadoop3.2.1-java8
+      type: string
