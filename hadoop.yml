@@ -8,6 +8,20 @@ hadoop-common:
     website: https://www.vaultproject.io
     publisher: monk.io
     icon: vault-hashicorp.png 
+  connections:
+    name-node:
+      runnable: monk-hadoop/hadoop-name-node
+      service: name-node-http-svc
+    resource-manager:
+      runnable: monk-hadoop/hadoop-resource-manager-node
+      service: resource-manager-svc
+    data-node:
+      runnable: monk-hadoop/hadoop-data-node
+      service: data-node-svc
+    history-manager:
+      runnable: monk-hadoop/hadoop-history-manager-node
+      service: history-manager-svc
+    
   variables:
     core_conf_fs:
       env: CORE_CONF_fs_defaultFS
@@ -140,19 +154,19 @@ hadoop-common:
       value: 9000
     monk_hdfs_namenode_host:
       env: NAMENODE_HOST
-      value: <- get-hostname("monk-hadoop/hadoop-name-node", "monk-hadoop-name-node") split(".dns.podman") join("")
+      value: <- connection-hostname("name-node") split(".dns.podman") join("")
       type: string
     monk_hdfs_datanode_host:
       env: DATANODE_HOST
-      value: <- get-hostname("monk-hadoop/hadoop-data-node", "monk-hadoop-data-node") split(".dns.podman") join("")
+      value: <- connection-hostname("data-node") split(".dns.podman") join("")
       type: string
     monk_hdfs_resourcemanager_host:
       env: RESOURCEMANAGER_HOST
-      value: <- get-hostname("monk-hadoop/hadoop-resource-manager-node", "monk-hadoop-resourcemanager-node") split(".dns.podman") join("")
+      value: <- connection-hostname("resource-manager") split(".dns.podman") join("")
       type: string
     monk_hdfs_historyserver_host:
-      env: RESOURCEMANAGER_HOST
-      value: <- get-hostname("monk-hadoop/hadoop-history-manager-node", "monk-hadoop-historyserver-node") split(".dns.podman") join("")
+      env: HISTORYMANAGER_HOST
+      value: <- connection-hostname("history-manager") split(".dns.podman") join("")
       type: string
     monk_hdfs_datanode_service_precondition:
       env: DATANODE_SERVICE_PRECONDITION
@@ -189,6 +203,15 @@ hadoop-name-node:
         - <- `0.0.0.0:${name_node_http}:9870`
         - <- `0.0.0.0:${name_node_port}:9000`
       image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+  services:
+    name-node-http-svc:
+      container: monk-hadoop-name-node
+      port: 9870
+      protocol: tcp
+    name-node-port-svc:
+      container: monk-hadoop-name-node
+      port: 9000
+      protocol: tcp
 
 hadoop-data-node:
   defines: runnable
@@ -200,6 +223,11 @@ hadoop-data-node:
       image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
       environment:
         - <- `SERVICE_PRECONDITION=${monk_hdfs_datanode_service_precondition}`
+  services:
+    data-node-svc:
+      container: monk-hadoop-data-node
+      port: 9864
+      protocol: tcp
 
 hadoop-resource-manager-node:
   defines: runnable
@@ -209,7 +237,13 @@ hadoop-resource-manager-node:
       image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
       environment:
         - <- `SERVICE_PRECONDITION=${monk_hdfs_resourcemanager_service_precondition}`
-hadoop-node-manager-node:
+  services:
+    resource-manager-svc:
+      container: monk-hadoop-resourcemanager-node
+      port: 8088
+      protocol: tcp
+
+hadoop-node-manager:
   defines: runnable
   inherits: ./hadoop-common
   containers:
@@ -217,6 +251,7 @@ hadoop-node-manager-node:
       image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
       environment:
         - <- `SERVICE_PRECONDITION=${monk_hdfs_nodemanager_service_precondition}`
+
 hadoop-history-manager-node:
   defines: runnable
   inherits: ./hadoop-common
@@ -227,4 +262,9 @@ hadoop-history-manager-node:
         - <- `${volume_local}/historyserver:/hadoop/yarn/timeline`
       environment:
         - <- `SERVICE_PRECONDITION=${monk_hdfs_nodemanager_service_precondition}`
+  services:
+    history-manager-svc:
+      container: monk-hadoop-historyserver-node
+      port: 8188
+      protocol: tcp
 
