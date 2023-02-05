@@ -1,4 +1,4 @@
-namespace: monk-hadoop 
+namespace: hadoop 
 
 hadoop-common:
   metadata:
@@ -10,16 +10,16 @@ hadoop-common:
     icon: vault-hashicorp.png 
   connections:
     name-node:
-      runnable: monk-hadoop/hadoop-name-node
+      runnable: hadoop/hadoop-name-node
       service: name-node-http-svc
     resource-manager:
-      runnable: monk-hadoop/hadoop-resource-manager-node
+      runnable: hadoop/hadoop-resource-manager-node
       service: resource-manager-svc
     data-node:
-      runnable: monk-hadoop/hadoop-data-node
+      runnable: hadoop/hadoop-data-node
       service: data-node-svc
     history-manager:
-      runnable: monk-hadoop/hadoop-history-manager-node
+      runnable: hadoop/hadoop-history-manager-node
       service: history-manager-svc
     
   variables:
@@ -182,7 +182,7 @@ hadoop-common:
       type: string
     volume_local:
       type: string
-      value: <- `${monk-volume-path}/monk-hadoop-1`
+      value: <- `${monk-volume-path}/hadoop-1`
     image-tag:
       env: IMAGE_TAG
       value: <- `${image_tag}`
@@ -196,7 +196,7 @@ hadoop-name-node:
   defines: runnable
   inherits: ./hadoop-common
   containers:
-    monk-hadoop-name-node:
+    hadoop-name-node:
       paths:
         - <- `${volume_local}/namenode:/hadoop/dfs/name`
       ports:
@@ -205,11 +205,11 @@ hadoop-name-node:
       image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
   services:
     name-node-http-svc:
-      container: monk-hadoop-name-node
+      container: hadoop-name-node
       port: 9870
       protocol: tcp
     name-node-port-svc:
-      container: monk-hadoop-name-node
+      container: hadoop-name-node
       port: 9000
       protocol: tcp
 
@@ -217,7 +217,7 @@ hadoop-data-node:
   defines: runnable
   inherits: ./hadoop-common
   containers:
-    monk-hadoop-data-node:
+    hadoop-data-node:
       paths:
         - <- `${volume_local}/datanode:/hadoop/dfs/data`
       image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
@@ -225,7 +225,7 @@ hadoop-data-node:
         - <- `SERVICE_PRECONDITION=${monk_hdfs_datanode_service_precondition}`
   services:
     data-node-svc:
-      container: monk-hadoop-data-node
+      container: hadoop-data-node
       port: 9864
       protocol: tcp
 
@@ -233,13 +233,13 @@ hadoop-resource-manager-node:
   defines: runnable
   inherits: ./hadoop-common
   containers:
-    monk-hadoop-resourcemanager-node:
+    hadoop-resourcemanager-node:
       image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
       environment:
         - <- `SERVICE_PRECONDITION=${monk_hdfs_resourcemanager_service_precondition}`
   services:
     resource-manager-svc:
-      container: monk-hadoop-resourcemanager-node
+      container: hadoop-resourcemanager-node
       port: 8088
       protocol: tcp
 
@@ -247,7 +247,7 @@ hadoop-node-manager:
   defines: runnable
   inherits: ./hadoop-common
   containers:
-    monk-hadoop-nodemanager-node:
+    hadoop-nodemanager-node:
       image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
       environment:
         - <- `SERVICE_PRECONDITION=${monk_hdfs_nodemanager_service_precondition}`
@@ -256,7 +256,7 @@ hadoop-history-manager-node:
   defines: runnable
   inherits: ./hadoop-common
   containers:
-    monk-hadoop-historyserver-node:
+    hadoop-historyserver-node:
       image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
       paths:
         - <- `${volume_local}/historyserver:/hadoop/yarn/timeline`
@@ -264,7 +264,7 @@ hadoop-history-manager-node:
         - <- `SERVICE_PRECONDITION=${monk_hdfs_nodemanager_service_precondition}`
   services:
     history-manager-svc:
-      container: monk-hadoop-historyserver-node
+      container: hadoop-historyserver-node
       port: 8188
       protocol: tcp
 
