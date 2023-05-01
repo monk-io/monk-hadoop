@@ -1,4 +1,5 @@
-namespace: hadoop 
+---
+namespace: hadoop
 
 hadoop-common:
   metadata:
@@ -7,7 +8,7 @@ hadoop-common:
     description: Vault secures, stores, and tightly controls access to tokens, passwords, certificates, API keys, and other secrets in modern computing.
     website: https://www.vaultproject.io
     publisher: monk.io
-    icon: vault-hashicorp.png 
+    icon: vault-hashicorp.png
   connections:
     name-node:
       runnable: hadoop/hadoop-name-node
@@ -21,7 +22,6 @@ hadoop-common:
     history-manager:
       runnable: hadoop/hadoop-history-manager-node
       service: history-manager-svc
-    
   variables:
     core_conf_fs:
       env: CORE_CONF_fs_defaultFS
@@ -31,10 +31,10 @@ hadoop-common:
       value: root
     core_conf_proxy_user_hue_hosts:
       env: CORE_CONF_hadoop_proxyuser_hue_hosts
-      value: "*"
+      value: '*'
     core_conf_proxy_user_hue_groups:
       env: CORE_CONF_hadoop_proxyuser_hue_groups
-      value: "*"
+      value: '*'
     core_conf_compression_codec:
       env: CORE_CONF_io_compression_codecs
       value: org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.BZip2Codec,org.apache.hadoop.io.compress.SnappyCodec
@@ -83,9 +83,9 @@ hadoop-common:
     yarn_conf_resourcemanager_address:
       env: YARN_CONF_yarn_resourcemanager_address
       value: <- `${monk_hdfs_resourcemanager_host}:8032`
-    yarn_conf_resourcemanager_scheduler_address:   
+    yarn_conf_resourcemanager_scheduler_address:
       env: YARN_CONF_yarn_resourcemanager_scheduler_address
-      value: <- `${monk_hdfs_resourcemanager_host}:8030` 
+      value: <- `${monk_hdfs_resourcemanager_host}:8030`
     yarn_conf_resourcemanager_resource_tracker_address:
       env: YARN_CONF_yarn_resourcemanager_resource___tracker_address
       value: <- `${monk_hdfs_resourcemanager_host}:8031`
@@ -199,9 +199,6 @@ hadoop-name-node:
     hadoop-name-node:
       paths:
         - <- `${volume_local}/namenode:/hadoop/dfs/name`
-      ports:
-        - <- `0.0.0.0:${name_node_http}:9870`
-        - <- `0.0.0.0:${name_node_port}:9000`
       image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
   services:
     name-node-http-svc:
@@ -267,4 +264,3 @@ hadoop-history-manager-node:
       container: hadoop-historyserver-node
       port: 8188
       protocol: tcp
-
