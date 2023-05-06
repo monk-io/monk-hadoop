@@ -1,13 +1,16 @@
 # Hadoop & Monk
+
 This repository contains Monk.io template to deploy Hadoop either locally or on cloud of your choice (AWS, GCP, Azure, Digital Ocean).
 
-# Prerequisites
+## Prerequisites
+
 - [Install Monk](https://docs.monk.io/docs/get-monk)
 - [Register and Login Monk](https://docs.monk.io/docs/acc-and-auth)
 - [Add Cloud Provider](https://docs.monk.io/docs/cloud-provider)
 - [Add Instance](https://docs.monk.io/docs/multi-cloud)
 
-#### Make sure monkd is running.
+## Make sure monkd is running
+
 ```bash
 foo@bar:~$ monk status
 daemon: ready
@@ -16,18 +19,18 @@ not connected to cluster
 ```
 
 ## Clone Repository
+
 ```bash
 git clone https://github.com/monk-io/hadoop
 ```
 
 ## Load Template
+
 ```bash
 cd hadoop
 monk load MANIFEST
 ```
 
-
-#### Let's take a look at the themes I have installed.
 ```bash
 foo@bar:~$ monk list hadoop
 ✔ Got the list
@@ -38,6 +41,7 @@ group     hadoop/stack   local       -        -
 ```
 
 ## Deploy Stack
+
 ```bash
 foo@bar:~$ monk run hadoop/stack
 ? Select tag to run [local/hadoop/stack] on: mnk
@@ -75,36 +79,26 @@ foo@bar:~$ monk run hadoop/stack
           └─🧩 bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
 
 💡 You can inspect and manage your above stack with these commands:
-	monk logs (-f) local/hadoop/stack - Inspect logs
-	monk shell     local/hadoop/stack - Connect to the container's shell
-	monk do        local/hadoop/stack/action_name - Run defined action (if exists)
+ monk logs (-f) local/hadoop/stack - Inspect logs
+ monk shell     local/hadoop/stack - Connect to the container's shell
+ monk do        local/hadoop/stack/action_name - Run defined action (if exists)
 💡 Check monk help for more!
 ```
- 
- ## Open Web Ui
- ```
-http://13.53.139.95:9870
-```
 
+## Open Web Ui
+
+http://13.53.139.95:9870
 
 ## Variables
+
 The variables are in `stack.yml` file. You can quickly setup by editing the values here.
 
-| Variable                     	| Description                               	|
-|------------------------------	|-------------------------------------------	|
-| kong_database_name            | Kong database name, Default: kong 	               |
-| kong_database_password        | Kong database password, Default kong                     	|
-| kong_database_user            | Kong database user, Default: kong                     	|
-| kong_database_port            | Kong database port, Default: 5432                     	|
-| kong_proxy_listen             | Kong Proxy listen, Default 8000                     	|
-| kong_admin_listen               | Kong admin listen, Default 8001                     	|
-| konga_admin_listen               | Konga port Default: 1337                     	|
-
-
-
+| Variable     | Description      | Default                 |
+| ------------ | ---------------- | ----------------------- |
+| image_tag    | Image tag to use | 3.2.1-hadoop3.2.1-java8 |
+| cluster_name | Cluster Name     | Monk SuperCluster       |
 ## Stop, remove and clean up workloads and templates
 
 ```bash
 monk purge -x -a
 ```
-

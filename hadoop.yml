@@ -3,12 +3,31 @@ namespace: hadoop
 
 hadoop-common:
   metadata:
-    defines: metadata
-    name: Vault by HashiCorp
-    description: Vault secures, stores, and tightly controls access to tokens, passwords, certificates, API keys, and other secrets in modern computing.
-    website: https://www.vaultproject.io
+    name: Hadoop
+    description: |
+      Hadoop is a widely used open-source framework designed for distributed storage and processing of large datasets. It provides a highly scalable and fault-tolerant platform for storing and processing big data using commodity hardware.
+
+      At its core, Hadoop consists of two main components: the Hadoop Distributed File System (HDFS) and MapReduce. HDFS is a distributed file system that stores data across multiple nodes in a cluster, while MapReduce is a programming model for processing large datasets in parallel across the cluster.
+
+      Hadoop is highly versatile and can handle a wide range of data types, from structured to unstructured, including text, images, and videos. It also offers a variety of tools and APIs for data processing, such as Hive, Pig, and Spark.
+
+      Hadoop has become an essential tool in the field of big data and is used by many organizations to manage and analyze vast amounts of data efficiently and cost-effectively. Its flexibility, scalability, and fault tolerance make it a popular choice for data-driven applications in industries such as finance, healthcare, and retail.
+
+      ---
+
+      Notes:
+
+      | Variable     | Description      | Default                 |
+      | ------------ | ---------------- | ----------------------- |
+      | image_tag    | Image tag to use | 3.2.1-hadoop3.2.1-java8 |
+      | cluster_name | Cluster Name     | Monk SuperCluster       |
+    website: https://hadoop.apache.org/
     publisher: monk.io
-    icon: vault-hashicorp.png
+    icon: https://hadoop.apache.org/elephant.png
+    source: https://github.com/apache/hadoop
+    tags: Hadoop, Big Data, Distributed Computing, HDFS, MapReduce, Data Processing, Data Analytics, Data Storage, Apache, Open Source, Scalability, Fault Tolerance, Hive, Pig, Spark, Data-driven Applications
+    license: Apache License 2.0
+    private: true
   connections:
     name-node:
       runnable: hadoop/hadoop-name-node
@@ -185,11 +204,11 @@ hadoop-common:
       value: <- `${monk-volume-path}/hadoop-1`
     image-tag:
       env: IMAGE_TAG
-      value: <- `${image_tag}`
+      value: <- `${image_tag}` default("3.2.1-hadoop3.2.1-java8")
       type: string
     monk_hdfs_cluster_name:
       env: CLUSTER_NAME
-      value: <- `${cluster_name}`
+      value: <- `${cluster_name}` default("Monk SuperCluster")
       type: string
 
 hadoop-name-node:
@@ -205,10 +224,12 @@ hadoop-name-node:
       container: hadoop-name-node
       port: 9870
       protocol: tcp
+      host-port: 9870
     name-node-port-svc:
       container: hadoop-name-node
       port: 9000
       protocol: tcp
+      host-port: 9000
 
 hadoop-data-node:
   defines: runnable
@@ -225,6 +246,7 @@ hadoop-data-node:
       container: hadoop-data-node
       port: 9864
       protocol: tcp
+      host-port: 9864
 
 hadoop-resource-manager-node:
   defines: runnable
@@ -239,6 +261,7 @@ hadoop-resource-manager-node:
       container: hadoop-resourcemanager-node
       port: 8088
       protocol: tcp
+      host-port: 8088
 
 hadoop-node-manager:
   defines: runnable
@@ -264,3 +287,4 @@ hadoop-history-manager-node:
       container: hadoop-historyserver-node
       port: 8188
       protocol: tcp
+      host-port: 8188
