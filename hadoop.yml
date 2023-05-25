@@ -25,7 +25,7 @@ hadoop-common:
     publisher: monk.io
     icon: https://hadoop.apache.org/elephant.png
     source: https://github.com/apache/hadoop
-    tags: Hadoop, Big Data, Distributed Computing, HDFS, MapReduce, Data Processing, Data Analytics, Data Storage, Apache, Open Source, Scalability, Fault Tolerance, Hive, Pig, Spark, Data-driven Applications
+    tags: data-driven applications, data processing, data storage, apache, pig, spark, big data, data analytics, scalability, hadoop, fault tolerance, mapreduce, hive, distributed computing, hdfs, open source
     license: Apache License 2.0
     private: true
   connections:
