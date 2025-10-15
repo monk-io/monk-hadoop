@@ -1,0 +1,174 @@
+---
+title: Apache Hadoop
+description: Ready-to-run Apache Hadoop container stack you can run directly or inherit to integrate distributed data processing into your infrastructure.
+primary_category: big-data
+tags: [hadoop, big-data, mapreduce, hdfs, template, runnable, stack, distributed]
+integration_type: template
+hosting_models: [self-hosted]
+website_url: https://hadoop.apache.org/
+docs_url: https://hadoop.apache.org/docs/
+publisher: monk.io
+---
+
+## Overview
+
+This template provides a production‑ready Apache Hadoop stack as a Monk runnable. You can:
+
+- Run it directly to get a managed Hadoop cluster with sensible defaults
+- Inherit it in your own runnable to seamlessly add distributed data processing and storage to your stack
+
+Apache Hadoop is an open-source framework for distributed storage and processing of large datasets using the MapReduce programming model. It includes HDFS (Hadoop Distributed File System) for storage and YARN for resource management.
+
+## What this template manages
+
+- Hadoop NameNode (HDFS master) with HTTP interface on port 9870
+- Hadoop DataNode (HDFS storage) on port 9864
+- Resource Manager (YARN) on port 8088
+- NodeManager (YARN compute)
+- History Server for job tracking on port 8188
+- Persistent volumes for NameNode, DataNode, and HistoryServer data
+
+## Quick start (run directly)
+
+1) Load templates
+
+```bash
+monk load MANIFEST
+```
+
+2) Run Hadoop stack
+
+```bash
+monk run hadoop/stack
+```
+
+3) Customize configuration (optional)
+
+Running directly uses the defaults defined in this template's `variables`. To customize:
+
+- Preferred: inherit and override variables as shown below.
+- Alternative: fork/clone and edit the `variables` in `stack.yml`, then `monk load MANIFEST` and run.
+
+Once started, access the web interfaces:
+- NameNode: `http://localhost:9870`
+- ResourceManager: `http://localhost:8088`
+- HistoryServer: `http://localhost:8188`
+
+## Configuration
+
+Key variables you can customize in this template:
+
+```yaml
+variables:
+  image_tag: "3.2.1-hadoop3.2.1-java8"    # Hadoop version/image tag
+  cluster_name: "Monk SuperCluster"        # HDFS cluster name
+```
+
+Additional configuration through environment variables (defined in hadoop-common):
+- HDFS settings: WebHDFS enabled, permissions, replication
+- YARN settings: Resource limits, memory, CPU cores
+- MapReduce settings: Memory allocation, compression codecs
+
+Data is persisted under `${monk-volume-path}/hadoop-1` on the host:
+- `/namenode` - NameNode metadata
+- `/datanode` - HDFS data blocks
+- `/historyserver` - Job history and logs
+
+## Use by inheritance (recommended for apps)
+
+Inherit the Hadoop stack in your application and declare connections. Example for a data processing application:
+
+```yaml
+namespace: myapp
+hadoop-cluster:
+  defines: process-group
+  inherits: hadoop/stack
+  variables:
+    cluster_name:
+      value: <- secret("hadoop-cluster-name") default("MyApp Cluster")
+
+data-processor:
+  defines: runnable
+  containers:
+    processor:
+      image: myorg/data-processor
+      environment:
+        - <- `HADOOP_NAMENODE=${hdfs_namenode_host}`
+        - <- `YARN_RESOURCEMANAGER=${yarn_rm_host}`
+  variables:
+    hdfs_namenode_host:
+      value: <- connection-hostname("namenode") default("localhost")
+    yarn_rm_host:
+      value: <- connection-hostname("resourcemanager") default("localhost")
+
+app:
+  defines: process-group
+  runnable-list:
+    - myapp/hadoop-cluster
+    - myapp/data-processor
+```
+
+Then run your app:
+
+```bash
+monk secrets add -g hadoop-cluster-name="Production Cluster"
+monk run myapp/app
+```
+
+## Ports and connectivity
+
+The Hadoop stack exposes the following services:
+
+- **NameNode HTTP**: TCP `9870` - Web UI and REST API
+- **NameNode RPC**: TCP `9000` - HDFS client connections
+- **DataNode**: TCP `9864` - Data transfer and HTTP
+- **ResourceManager**: TCP `8088` - YARN web UI and REST API
+- **HistoryServer**: TCP `8188` - Job history web UI
+
+From other runnables in the same process group, use `connection-hostname("<connection-name>")` to resolve service hosts.
+
+## Persistence and configuration
+
+- **NameNode data**: `${monk-volume-path}/hadoop-1/namenode:/hadoop/dfs/name`
+- **DataNode data**: `${monk-volume-path}/hadoop-1/datanode:/hadoop/dfs/data`
+- **HistoryServer data**: `${monk-volume-path}/hadoop-1/historyserver:/hadoop/yarn/timeline`
+
+All data is persisted to the host volumes and will survive container restarts. Ensure the host volumes are writable by the container user (typically UID 1000).
+
+## Features
+
+- Distributed file system (HDFS) with configurable replication
+- MapReduce processing framework
+- YARN resource management with configurable memory and CPU limits
+- Scalable and fault-tolerant architecture
+- Supports batch processing workloads
+- WebHDFS REST API enabled by default
+- Job history tracking and log aggregation
+
+## Related templates
+
+- See other templates in this repository for complementary services
+- Combine with monitoring tools (`prometheus-grafana/`) for observability
+- Integrate with Apache Spark, Hive, or other Hadoop ecosystem tools
+- Use with object storage (MinIO) for backup and archival
+
+## Troubleshooting
+
+- **If NameNode fails to start**: Check that the volume path is writable and that port 9870 and 9000 are not in use.
+- **If DataNode cannot connect to NameNode**: Verify network connectivity and that the NameNode is fully started (check logs).
+- **If jobs fail with memory errors**: Adjust YARN memory settings in the configuration variables (`yarn_conf_nodemanager_resource_memory_mb`, `mapred_conf_map_memory_mb`, etc.).
+- **If changing cluster_name on existing data**: This may cause NameNode to reject DataNodes. Either reset volumes or keep the same cluster name.
+
+Check logs for detailed error messages:
+
+```bash
+monk logs -l 500 -f hadoop/stack
+```
+
+View logs for individual components:
+
+```bash
+monk logs -l 500 -f hadoop/hadoop-name-node
+monk logs -l 500 -f hadoop/hadoop-data-node
+monk logs -l 500 -f hadoop/hadoop-resource-manager-node
+```
